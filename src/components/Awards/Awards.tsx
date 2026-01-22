@@ -1,69 +1,60 @@
-import { useAppDispatch, useGetBalance } from '@/hooks/storeHooks'
-import { updateBalance } from '@/store/store'
 import { useMediaQuery } from 'usehooks-ts'
-import { lazy, memo, useEffect, useState } from 'react'
-import successToast from '@/utils/successToast'
-import warningToast from '@/utils/warningToast'
-import { AwardsDay } from './AwardsDay'
-import { makeDisplayFalse } from '@/utils/makeDisplayFalse'
-import type { TasksOrAwards } from '@/types/TasksOrAwards'
+import { lazy, memo, useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from '@/hooks/storeHooks'
 
 const Item = lazy(() => import('../Item'))
+const AwardsDay = lazy(() => import('./AwardsDay'))
 
 function Awards() {
-  const balance = useGetBalance()
-  const [awards, setAwards] = useState<TasksOrAwards[] | null>(null)
-  const sortedAwards = [...awards].sort((a, b) => b.price - a.price)
   const isMobile = !useMediaQuery('(min-width: 768px)')
+
+  const awards = useAppSelector(({ awards }) => awards)
+  const balance = useAppSelector(({ balance }) => balance)
+
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     const get = async () => {
-      const getList = (await import('@/utils/getList')).getList
-      const awards = (await getList('awards')) as TasksOrAwards[]
-      setAwards(awards)
+      if (awards === null) {
+        const { getAwards } = await import('@/store/awardsSlice')
+        dispatch(getAwards())
+      }
     }
     get()
-  }, [])
+  }, [awards, dispatch])
+
   return (
-    <>
-      <div className="flex flex-wrap gap-1">
-        <AwardsDay styled={!isMobile} />
-        {sortedAwards.map(
-          ({ icon, title, price, id, display, daily }, index) => {
-            if (
-              !awardsDay.includes(id)! &&
-              !completedAwards.includes(id) &&
-              display
-            ) {
-              return (
-                <Item
-                  style={{ width: isMobile ? '' : 'calc(50% - 2px)' }}
-                  key={index}
-                  icon={icon}
-                  title={title}
-                  price={'-' + Math.abs(price).toString()}
-                  onButtonClick={() => {
-                    if (balance >= Math.abs(price)) {
-                      successToast(`Покупочка оформлена! -${Math.abs(price)}`)
-                      dispatch(updateBalance(-Math.abs(price)))
-                      dispatch(
-                        handleSave({
-                          completedAwards: [...completedAwards, id],
-                        }),
-                      )
-                      if (!daily) makeDisplayFalse('awards', id)
-                    } else {
-                      warningToast('Упс! Не хватает звёздочек!')
-                    }
-                  }}
-                />
-              )
-            }
-          },
-        )}
-      </div>
-    </>
+    <div className="flex flex-wrap gap-1">
+      {awards && <AwardsDay styled={!isMobile} />}
+      {awards &&
+        [...awards]
+          .sort((a, b) => b.price - a.price)
+          .map(({ icon, title, price, id, daily }) => (
+            <Item
+              style={{ width: isMobile ? '' : 'calc(50% - 2px)' }}
+              key={id}
+              icon={icon}
+              title={title}
+              price={'-' + Math.abs(price).toString()}
+              onButtonClick={async () => {
+                if (balance === null) return
+                const newBalance = Number(balance) + Number(price)
+                if (newBalance < 0) {
+                  const { warningToast } = await import('@/utils/warningToast')
+                  warningToast('Не хватает звёздочек(')
+                  return
+                }
+                const { successToast } = await import('@/utils/successToast')
+                const { updateBalance, updateAwards } = await import(
+                  '@/store/store'
+                )
+                dispatch(updateBalance(newBalance))
+                dispatch(updateAwards({ id, daily }))
+                successToast('Куплено! -' + Math.abs(Number(price)))
+              }}
+            />
+          ))}
+    </div>
   )
 }
 

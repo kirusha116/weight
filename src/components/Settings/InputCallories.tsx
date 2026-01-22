@@ -2,7 +2,7 @@ import { settings, settingsLabels } from '@/constants/settings'
 import { Input } from '../ui/input'
 import type { UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form'
 import { Label } from '../ui/label'
-import type { InForm } from '@/types/Storage'
+import type { InForm } from '@/types/InForm'
 
 export default function InputCallories({
   settingsKey,

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import type { InForm } from '@/types/Storage'
+import type { InForm } from '@/types/InForm'
 import type { UseFormReset } from 'react-hook-form'
 
 export default function FormButtons({

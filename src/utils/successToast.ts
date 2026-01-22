@@ -1,6 +1,6 @@
 import { toast } from 'sonner'
 
-export default function successToast(text: string) {
+export function successToast(text: string) {
   toast.success(text, {
     classNames: {
       

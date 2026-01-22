@@ -1,18 +1,12 @@
-import { auth, db } from '@/firebase'
-import { doc, updateDoc } from 'firebase/firestore'
-
 export const makeDisplayFalse = async (
-  variant: 'tasks' | 'awards',
+  target: 'awards' | 'tasks',
   id: number,
 ) => {
-  if (auth.currentUser) {
-    await updateDoc(
-      doc(
-        db,
-        `${auth.currentUser.uid}/tasksOrAwards/${variant}`,
-        id.toString(),
-      ),
-      { display: false },
-    )
-  }
+  const { doc, updateDoc } = await import('firebase/firestore')
+  const { auth } = await import('@/auth')
+  const { db } = await import('@/db')
+  await updateDoc(
+    doc(db, `${auth.currentUser?.uid}_new/${target}/${target}`, id.toString()),
+    { display: false },
+  )
 }

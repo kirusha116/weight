@@ -15,13 +15,10 @@ import {
 import { Label } from './ui/label.js'
 import { Button } from './ui/button.js'
 import { useState } from 'react'
-import { Heart } from './Heart'
-import warningToast from '@/utils/warningToast.js'
-import successToast from '@/utils/successToast.js'
-import { auth } from '@/firebase.js'
-import { getStorage } from '@/utils/getStorage.js'
-import { useAppDispatch, useGetStorage } from '@/hooks/storeHooks.js'
-import { handleSave } from '@/store/store.js'
+import Heart from './Heart'
+import { warningToast } from '@/utils/warningToast.js'
+import { successToast } from '@/utils/successToast.js'
+import { auth } from '@/auth.js'
 
 type Data = {
   email: string
@@ -30,17 +27,8 @@ type Data = {
 
 export default function Login() {
   const [isHeartOpen, setIsHeartOpen] = useState<boolean>(false)
-  const storage = useGetStorage()
-  const dispatch = useAppDispatch()
 
   const onFulfilled = async () => {
-    let i = 0
-    let innerStorage = null
-    while (innerStorage === null && i < 5) {
-      innerStorage = await getStorage()
-      i++
-    }
-    if (!innerStorage) dispatch(handleSave(storage))
     setIsHeartOpen(false)
     successToast('Успешно!')
   }

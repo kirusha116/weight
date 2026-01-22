@@ -2,15 +2,16 @@ import { NavLink } from 'react-router-dom'
 import { useMediaQuery } from 'usehooks-ts'
 import { Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useGetBalance } from '@/hooks/storeHooks'
+import { useAppDispatch, useAppSelector } from '@/hooks/storeHooks'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { useState } from 'react'
-import { Heart } from '@/components/Heart'
+import { useEffect, useState } from 'react'
+import Heart from '@/components/Heart'
 import type { Dialog } from '@/types/Dialog'
 
 export default function Header() {
-  const balance = useGetBalance()
+  const balance = useAppSelector(({ balance }) => balance)
 
+  const dispatch = useAppDispatch()
   const isSmall = !useMediaQuery('(min-width: 480px)')
 
   const [isAuth, setIsAuth] = useState<boolean>(true)
@@ -28,6 +29,15 @@ export default function Header() {
     setIsAuth(!!getAuth().currentUser)
   })
 
+  useEffect(() => {
+    const get = async () => {
+      if (balance === null) {
+        const { getBalance } = await import('@/store/balanceSlice')
+        await dispatch(getBalance())
+      }
+    }
+    get()
+  }, [balance, dispatch])
   return (
     <header className="lg:container xl:max-w-7xl px-5 pt-5 m-auto flex justify-between items-center">
       <NavLink
@@ -45,7 +55,7 @@ export default function Header() {
         )}
       </NavLink>
       <div className="grow"></div>
-      <p className="flex text-xl">{balance}</p>
+      {balance && <p className="flex text-xl">{balance}</p>}
       <Star className="ml-1 size-6 stroke-rose-300 fill-rose-300" />
       {!isAuth && (
         <Button

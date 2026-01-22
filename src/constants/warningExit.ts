@@ -1,5 +1,5 @@
-import { auth } from '@/firebase'
-import warningToast from '@/utils/warningToast'
+import { auth } from '@/auth'
+import { warningToast } from '@/utils/warningToast'
 import { signOut } from 'firebase/auth'
 
 export const getParams = (

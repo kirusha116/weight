@@ -1,4 +1,4 @@
-import { Heart } from '@/components/Heart'
+import Heart from '@/components/Heart'
 import { lazy, Suspense } from 'react'
 
 const Header = lazy(() => import('@/components/Settings/Header'))

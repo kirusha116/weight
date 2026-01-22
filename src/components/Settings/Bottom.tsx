@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
-import { Heart } from '../Heart'
+import Heart from '../Heart'
 import type { WarningDialog } from '@/types/WarningComp'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 

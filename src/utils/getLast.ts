@@ -1,14 +1,15 @@
-import { auth, db } from '@/firebase'
 import type { Target } from '@/types/Target'
 import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
 
-export default async function getLast(target: Target) {
+export async function getLast(target: Target, order: string = 'timestamp') {
   const result: unknown[] = []
+  const { auth } = await import('@/auth')
+  const { db } = await import('@/db')
   if (auth.currentUser) {
     const responce = await getDocs(
       query(
         collection(db, `${auth.currentUser.uid}_new/${target}/${target}`),
-        orderBy('timestamp', 'desc'),
+        orderBy(order, 'desc'),
         limit(1),
       ),
     )

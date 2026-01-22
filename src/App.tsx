@@ -1,12 +1,12 @@
-import './firebase.js'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import React, { lazy, useEffect, useState, type JSX } from 'react'
-import { useAppDispatch } from './hooks/storeHooks.js'
-import { Heart } from './components/Heart.js'
-import { auth } from './firebase.js'
+import Heart from './components/Heart.js'
 import { onAuthStateChanged } from 'firebase/auth'
 import type { ToasterProps } from 'sonner'
-import { DynamicIcon } from 'lucide-react/dynamic'
+import { useAppDispatch } from './hooks/storeHooks.js'
+import './firebase.js'
+import { auth } from './auth.js'
+
 const Layout = lazy(() => import('./pages/Layout'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Tasks = lazy(() => import('./pages/Tasks'))
@@ -17,36 +17,43 @@ const Login = lazy(() => import('./components/Login.js'))
 
 function App() {
   const [isDownloaded, setIsDownloaded] = useState(false)
+
   const [isLoginVisible, setIsLoginVisible] = useState<boolean>(false)
+
   const [Toaster, setToaster] = useState<
     (({ ...props }: ToasterProps) => JSX.Element) | null
   >(null)
+
   const [CheckCheck, setCheckCheck] = useState<React.FC | null>(null)
+
   const [Frown, setFrown] = useState<React.FC | null>(null)
 
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, () => {
+    const unsubscribe = onAuthStateChanged(auth, async () => {
+      
       setIsLoginVisible(!auth.currentUser)
       if (auth.currentUser) {
         const load = async () => {
-          const { getTasks } = await import('./store/tasksSlice.js')
-          await dispatch(getTasks())
+          const { getBalance } = await import('./store/balanceSlice.js')
+          await dispatch(getBalance())
           setIsDownloaded(true)
         }
         load()
       }
-      async function getToaster() {
-        const { Toaster } = await import('./components/ui/sonner')
-        setToaster(() => Toaster)
-        setCheckCheck(() => () => <DynamicIcon name={'check-check'} />)
-        setFrown(() => () => <DynamicIcon name={'frown'} />)
-      }
-      getToaster()
     })
-    return unsubscribe
-  }, [dispatch])
+
+    async function getToaster() {
+      const { Toaster } = await import('./components/ui/sonner')
+      const { DynamicIcon } = await import('lucide-react/dynamic')
+      setToaster(() => Toaster)
+      setCheckCheck(() => () => <DynamicIcon name={'check-check'} />)
+      setFrown(() => () => <DynamicIcon name={'frown'} />)
+    }
+    if (!Toaster) getToaster()
+    return () => unsubscribe()
+  }, [Toaster, dispatch])
 
   return (
     <>

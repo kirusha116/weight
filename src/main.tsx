@@ -1,6 +1,6 @@
 import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Heart } from './components/Heart'
+import Heart from './components/Heart'
 import { Provider } from 'react-redux'
 import { store } from './store/store'
 import './index.css'

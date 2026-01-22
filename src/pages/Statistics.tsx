@@ -1,5 +1,4 @@
 import Header from '@/components/Statistics/Header'
-import { auth, db } from '@/firebase'
 import { collection, getDocs, orderBy, query } from 'firebase/firestore'
 import { ArrowBigDown, ArrowBigUp, Minus } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -12,6 +11,8 @@ export default function Statistics() {
   useEffect(() => {
     async function loadHistory() {
       const history: WeigthHistory[] = []
+      const { auth } = await import('@/auth')
+      const { db } = await import('@/db')
       if (auth.currentUser) {
         const querySnapShot = await getDocs(
           query(

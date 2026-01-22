@@ -1,24 +1,19 @@
 import { settings } from '@/constants/settings'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { lazy, useEffect } from 'react'
-import type { InForm } from '@/types/Storage'
-import { auth } from '@/firebase'
 import { updateProfile, type User } from 'firebase/auth'
-import successToast from '@/utils/successToast'
-import getLast from '@/utils/getLast'
-import setLast from '@/utils/setLast'
+import { successToast } from '@/utils/successToast'
+import type { ReceivedData } from '@/types/ReceivedData'
+import type { InForm } from '@/types/InForm'
+import { auth } from '@/auth'
 
 const InputString = lazy(() => import('./InputString'))
 const InputWeight = lazy(() => import('./InputWeight'))
 const InputCallories = lazy(() => import('./InputCallories'))
 const FormButtons = lazy(() => import('./FormButtons'))
 
-type ReceivedData = { data: number; timestamp: number }
-
 export default function Form() {
   const name = auth.currentUser?.displayName
-
-  console.log(auth.currentUser)
 
   const { register, handleSubmit, reset, setValue, getFieldState } =
     useForm<InForm>({
@@ -32,9 +27,14 @@ export default function Form() {
 
   useEffect(() => {
     const get = async () => {
-      const startWeight = (await getLast('startWeight')) as ReceivedData
-      const targetWeight = (await getLast('targetWeight')) as ReceivedData
-      const maxCallories = (await getLast('maxCallories')) as ReceivedData
+      const { getLast } = await import('@/utils/getLast')
+      const startWeight = (await getLast('startWeight')) as ReceivedData<number>
+      const targetWeight = (await getLast(
+        'targetWeight',
+      )) as ReceivedData<number>
+      const maxCallories = (await getLast(
+        'maxCallories',
+      )) as ReceivedData<number>
       reset({
         startWeight:
           startWeight !== undefined ? startWeight.data.toString() : '',
@@ -52,6 +52,7 @@ export default function Form() {
       await updateProfile(auth.currentUser as User, {
         displayName: data.name,
       })
+    const { setLast } = await import('@/utils/setLast')
     if (getFieldState('startWeight').isDirty)
       await setLast(Number(data.startWeight), 'startWeight')
     if (getFieldState('targetWeight').isDirty)

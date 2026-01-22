@@ -1,6 +1,6 @@
-import type { TasksOrAward } from '@/types/TasksOrAwards'
+import type { TasksOrAwards } from '@/types/TasksOrAwards'
 
-export const tasks: TasksOrAward[] = [
+export const tasks: TasksOrAwards[] = [
   {
     icon: 'bed-double',
     title: 'Лечь спать до 10 часов',

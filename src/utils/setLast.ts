@@ -1,23 +1,25 @@
-import { auth, db } from '@/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 import { getDate } from './getDate'
 import type { Target } from '@/types/Target'
+import type { ReceivedData } from '@/types/ReceivedData'
 
-export default async function setLast(
-  data: unknown,
+export async function setLast<T>(
+  data: T,
   target: Target,
-  action: ((data: unknown) => void) | null = null,
+  action: ((data: ReceivedData<T>) => void) | null = null,
 ) {
+  const { auth } = await import('@/auth')
+  const { db } = await import('@/db')
   if (auth.currentUser) {
-    const empty = { data: data, timestamp: Date.now() }
+    const obj = { data: data, timestamp: Date.now() }
     await setDoc(
       doc(
         db,
         `${auth.currentUser.uid}_new/${target}/${target}`,
-        getDate(empty.timestamp),
+        getDate(obj.timestamp),
       ),
-      empty,
+      obj,
     )
-    if (action !== null) action(empty)
+    if (action !== null) action(obj)
   }
 }

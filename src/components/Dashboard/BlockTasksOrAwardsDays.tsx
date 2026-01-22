@@ -1,13 +1,9 @@
 import { BicepsFlexed, Sparkles } from 'lucide-react'
 import { lazy, Suspense, type JSX, type ReactElement } from 'react'
-import { BlockHeart } from '../Heart'
+import { BlockHeart } from '../BlockHeart'
 
 const TasksDay = lazy(() => import('../../components/Tasks/TasksDay'))
-const AwardsDay = lazy(() =>
-  import('../../components/Awards/AwardsDay').then(module => ({
-    default: module.AwardsDay,
-  })),
-)
+const AwardsDay = lazy(() => import('../../components/Awards/AwardsDay'))
 
 type Variant = 'tasks' | 'awards'
 const iconClassName = 'stroke-rose-300 size-14 absolute'

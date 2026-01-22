@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { useMediaQuery } from 'usehooks-ts'
-import { BlockHeart } from '../Heart'
+import { BlockHeart } from '../BlockHeart'
 
 const BlockWeight = lazy(() => import('./BlockWeight'))
 const BlockCallories = lazy(() => import('./BlockCallories'))

@@ -5,3 +5,7 @@ export type Target =
   | 'targetWeight'
   | 'maxCallories'
   | 'currentCallories'
+  | 'awardsDay'
+  | 'tasksDay'
+  | 'completedAwards'
+  | 'completedTasks'

@@ -1,21 +1,17 @@
 import { createWeightProps } from '@/utils/createWeightProps'
 import { useMediaQuery } from 'usehooks-ts'
 import { lazy, memo, useCallback, useEffect, useMemo, useState } from 'react'
-import getLast from '@/utils/getLast'
-import { auth } from '@/firebase'
 import { getDate } from '@/utils/getDate'
 import { useDispatch } from 'react-redux'
 import { updateBalance } from '@/store/store'
 import type { BlockMainContentProps } from '@/types/BlockMainContentProps'
-import setLast from '@/utils/setLast'
+import type { ReceivedData } from '@/types/ReceivedData'
 
 const Block = lazy(() =>
   import('./Block').then(module => ({ default: module.Block })),
 )
 const BlockMainContent = lazy(() => import('./BlockMainContent'))
 const BlockNoData = lazy(() => import('./BlockNoData'))
-
-type ReceivedData = { data: number; timestamp: number }
 
 function BlockWeight() {
   const isMobile = !useMediaQuery('(min-width: 768px), (max-width: 639.5px)')
@@ -33,21 +29,22 @@ function BlockWeight() {
   useEffect(() => {
     const get = async () => {
       const actions = [
-        (data: ReceivedData) => {
+        (data: ReceivedData<number>) => {
           setCurrentWeight(data.data)
           setCurrentWeightDate(data.timestamp)
         },
-        (data: ReceivedData) => {
+        (data: ReceivedData<number>) => {
           setStartWeight(data.data)
         },
-        (data: ReceivedData) => {
+        (data: ReceivedData<number>) => {
           setTargetWeight(data.data)
         },
       ]
+      const { getLast } = await import('@/utils/getLast')
       const responce = await Promise.all([
-        getLast('currentWeight') as unknown as ReceivedData | undefined,
-        getLast('startWeight') as unknown as ReceivedData | undefined,
-        getLast('targetWeight') as unknown as ReceivedData | undefined,
+        getLast('currentWeight') as unknown as ReceivedData<number> | undefined,
+        getLast('startWeight') as unknown as ReceivedData<number> | undefined,
+        getLast('targetWeight') as unknown as ReceivedData<number> | undefined,
       ])
       responce.forEach(async (data, index) => {
         if (data !== undefined) {
@@ -60,7 +57,7 @@ function BlockWeight() {
         responce[1] !== undefined &&
         responce[2] !== undefined
       ) {
-        const setLast = (await import('@/utils/setLast')).default
+        const { setLast } = await import('@/utils/setLast')
         setLast(
           responce[1].data,
           'currentWeight',
@@ -95,6 +92,8 @@ function BlockWeight() {
     async (newValue: number) => {
       const timestamp = Date.now()
       dispatch(updateBalance(200))
+      const { setLast } = await import('@/utils/setLast')
+      const { auth } = await import('@/auth')
       if (auth.currentUser) setLast(newValue, 'currentWeight')
       setCurrentWeight(newValue)
       setCurrentWeightDate(timestamp)

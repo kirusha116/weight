@@ -1,15 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { tasksSlice } from './tasksSlice'
-import { awardsSlice } from './awardsSlice'
 import { balanceSlice } from './balanceSlice'
+import { awardsSlice } from './awardsSlice'
+import { tasksSlice } from './tasksSlice'
+import { awardsDaySlice } from './awardsDaySlice'
+import { tasksDaySlice } from './tasksDaySlice'
 
 export const { updateBalance } = balanceSlice.actions
+export const { updateAwardsDay } = awardsDaySlice.actions
+export const { updateTasksDay } = tasksDaySlice.actions
+export const { updateAwards } = awardsSlice.actions
+export const { updateTasks } = tasksSlice.actions
 
 export const store = configureStore({
   reducer: {
-    tasks: tasksSlice.reducer,
-    awards: awardsSlice.reducer,
     balance: balanceSlice.reducer,
+    awards: awardsSlice.reducer,
+    tasks: tasksSlice.reducer,
+    awardsDay: awardsDaySlice.reducer,
+    tasksDay: tasksDaySlice.reducer,
   },
 })
 
